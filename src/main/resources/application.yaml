@@ -1,4 +1,20 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: your-google-client-id
+            client-secret: your-google-client-secret
+            scope:
+              - email
+              - profile
+          facebook:
+            client-id: your-facebook-app-id
+            client-secret: your-facebook-app-secret
+            scope:
+              - email
+              - public_profile
   datasource:
     url: jdbc:postgresql://localhost:5433/linkserve_database
     username: postgres
@@ -12,3 +28,13 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+myapp:
+  jwt:
+    secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    expirationMs: 86400000
+    refresh-token:
+      expiration: 604800000
+
+
+

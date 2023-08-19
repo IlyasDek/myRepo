@@ -1,74 +1,89 @@
 package cri.vaycompany.linkserve.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import cri.vaycompany.linkserve.enums.Status;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+@Data
+@Builder
 @Entity
 @Table(name = "providers")
-public class Provider {
+public class Provider extends AbstractUser implements UserDetails {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(nullable = false)
+    private String location;
 
-    private String name;
-    private String contactData;
-    private String email;
-    private String password;
-    private String phoneNumber;
+    @Column(nullable = false)
+    private String serviceDescription;
 
+    @Column(nullable = false)
+    private double personalRating;
 
-    public Provider() {
+    @Column(nullable = false)
+    private double groupRating;
+
+    @Column(nullable = false)
+    private double recommendationRating;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    @OneToMany(mappedBy = "providerOne")
+    private Set<ProviderConnection> providerConnectionsAsProviderOne;
+
+    @OneToMany(mappedBy = "providerTwo")
+    private Set<ProviderConnection> providerConnectionsAsProviderTwo;
+
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
+    private Set<ServiceOffer> serviceOffers;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Arrays.asList(new SimpleGrantedAuthority(super.getRole().name()));
     }
 
-    public Long getId() {
-        return id;
+    @Override
+    public String getUsername() {
+        return super.getName();
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getContactData() {
-        return contactData;
-    }
-
-    public void setContactData(String contactData) {
-        this.contactData = contactData;
-    }
-
+    @Override
     public String getEmail() {
-        return email;
+        return super.getEmail();
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
+    @Override
     public String getPassword() {
-        return password;
+        return super.getPassword();
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

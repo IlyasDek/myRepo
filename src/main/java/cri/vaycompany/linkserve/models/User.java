@@ -1,106 +1,75 @@
 package cri.vaycompany.linkserve.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Objects;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+@Data
+@Builder
 @Entity
 @Table(name = "users")
-public class User {
+public class User extends AbstractUser implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+    @OneToMany(mappedBy = "userOne")
+    private Set<UserConnection> connectionsInitiatedByThisUser;
 
-    @Column(nullable = false)
-    private String contactData;
+    @OneToMany(mappedBy = "userTwo")
+    private Set<UserConnection> connectionsReceivedByThisUser;
 
-    @Column(nullable = false)
-    private String role;
+    @OneToMany(mappedBy = "user")
+    private List<Subscription> subscriptions;
 
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = false, unique = true)
-    private String phoneNumber;
-
-    public User() {
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Arrays.asList(new SimpleGrantedAuthority(super.getRole().name()));
     }
 
-    public Long getId() {
-        return id;
+    @Override
+    public String getUsername() {
+        return super.getName();
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getContactData() {
-        return contactData;
-    }
-
-    public void setContactData(String contactData) {
-        this.contactData = contactData;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
+    @Override
     public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-// конструкторы, геттеры и сеттеры
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id);
+        return super.getEmail();
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    public String getPassword() {
+        return super.getPassword();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

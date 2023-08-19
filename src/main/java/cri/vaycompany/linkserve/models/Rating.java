@@ -6,8 +6,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 @Entity
+@Builder
 @Table(name = "ratings")
 public class Rating {
 
@@ -21,50 +29,5 @@ public class Rating {
     @ManyToOne
     private ServiceOffer serviceOffer;
 
-    private int rating;
-    private int score;
-
-    public Rating() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public ServiceOffer getServiceOffer() {
-        return serviceOffer;
-    }
-
-    public void setServiceOffer(ServiceOffer serviceOffer) {
-        this.serviceOffer = serviceOffer;
-    }
-
-    public int getRating() {
-        return rating;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public int getScore() {
-        return this.score;
-    }
-
+    private double rating;
 }

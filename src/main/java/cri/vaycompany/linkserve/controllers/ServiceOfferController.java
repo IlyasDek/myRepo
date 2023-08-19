@@ -1,11 +1,14 @@
 package cri.vaycompany.linkserve.controllers;
 
-import cri.vaycompany.linkserve.models.ServiceOffer;
+import cri.vaycompany.linkserve.dto.ServiceOfferDTO;
 import cri.vaycompany.linkserve.services.ServiceOfferService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -20,28 +23,31 @@ public class ServiceOfferController {
     }
 
     @PostMapping
-    public ResponseEntity<ServiceOffer> createServiceOffer(@RequestBody ServiceOffer serviceOffer) {
-        return ResponseEntity.ok(serviceOfferService.createServiceOffer(serviceOffer));
+    public ResponseEntity<ServiceOfferDTO> createServiceOffer(@RequestBody ServiceOfferDTO serviceOfferDTO) {
+        ServiceOfferDTO createdServiceOffer = serviceOfferService.createServiceOffer(serviceOfferDTO);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(createdServiceOffer.getId()).toUri();
+        return ResponseEntity.created(location).body(createdServiceOffer);
     }
 
+
     @GetMapping("/{id}")
-    public ResponseEntity<ServiceOffer> getServiceOfferById(@PathVariable Long id) {
+    public ResponseEntity<ServiceOfferDTO> getServiceOfferById(@PathVariable Long id) {
         return serviceOfferService.getServiceOfferById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceOffer> updateServiceOffer(@PathVariable Long id, @RequestBody ServiceOffer serviceOffer) {
-        if (!id.equals(serviceOffer.getId())) {
-            throw new IllegalArgumentException("Id in the path and in the request body must be the same");
+    public ResponseEntity<ServiceOfferDTO> updateServiceOffer(@PathVariable Long id, @RequestBody ServiceOfferDTO serviceOfferDTO) {
+        try {
+            ServiceOfferDTO updatedServiceOfferDTO = serviceOfferService.updateServiceOffer(id, serviceOfferDTO);
+            return ResponseEntity.ok(updatedServiceOfferDTO);
+        } catch (IllegalArgumentException | EntityNotFoundException ex) {
+            return ResponseEntity.badRequest().build();
         }
-        return serviceOfferService.getServiceOfferById(id)
-                .map(existingServiceOffer -> {
-                    return ResponseEntity.ok(serviceOfferService.updateServiceOffer(serviceOffer));
-                })
-                .orElse(ResponseEntity.notFound().build());
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteServiceOffer(@PathVariable Long id) {
